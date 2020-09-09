@@ -9,8 +9,8 @@ import (
 		"io"
 		"bytes"
 		"errors"
-		"private.github.com/toarms/rpc1/yuan"
-		"private.github.com/toarms/rpc1/blockbuf"
+		"github.com/toarms/rpc2/server/yuan"
+		"github.com/toarms/rpc2/server/blockbuf"
 	   )
 
 // HandleFunc
