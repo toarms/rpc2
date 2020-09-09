@@ -1,0 +1,5 @@
+0. workflow
+	1> add struct to proto, generate protobuf code
+	2> start server/client, give it the {serveraddr, port} parameter
+	3> send struct to server, receive struct from server. encode/decode struct with protobuf
+	4> build service logic code on top of the "struct i/o"
