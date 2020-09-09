@@ -84,7 +84,6 @@ func (srv *Server)Start() error {
 	}
 
 	for {
-
 		client, err := srv.ln.Accept()
 		if err != nil {
 			select {
