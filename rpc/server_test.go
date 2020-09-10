@@ -1,4 +1,4 @@
-package main
+package rpc
 
 import (
 		"fmt"
@@ -11,9 +11,11 @@ import (
 
 var y Server
 func TestAccept(t *testing.T) {
-	var e echo
-	y.AddHandleFunc(0x01, e)
-	go y.Start()
+	var e Echo
+	HandlesFunc("0x01", e)
+	ListenAndServe(":7890")
+	ListenAndServe(":7891")
+
 
 
 	// Now, support 500 clients at the same time

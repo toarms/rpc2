@@ -1,4 +1,4 @@
-package main
+package rpc 
 
 import (
 		"fmt"
@@ -33,8 +33,19 @@ type Server struct {
 	mu sync.Mutex
 	ln net.Listener
 	activeConn map[*conn]struct{}
-	h map[int]HandleFunc
+	h map[string]HandleFunc
 	nclients int
+}
+
+var defaultServer Server
+
+func ListenAndServe(addr string) error {
+	go defaultServer.Start(addr)
+	return nil
+}
+
+func HandlesFunc(name string, h HandleFunc) {
+	defaultServer.AddHandleFunc(name, h)
 }
 
 // doneChan
@@ -65,19 +76,19 @@ func (srv *Server)add() {
 	fmt.Println("this is add")
 }
 
-func (srv *Server)AddHandleFunc(servid int, h HandleFunc) {
+func (srv *Server)AddHandleFunc(servname string , h HandleFunc) {
 
 	if srv.h == nil {
-		srv.h = make(map[int]HandleFunc)
+		srv.h = make(map[string]HandleFunc)
 	}
-	srv.h[servid] = h
+	srv.h[servname] = h
 }
 
-func (srv *Server)Start() error {
+func (srv *Server)Start(addr string) error {
 	fmt.Println("Start...")
 
 	var err error
-	srv.ln, err = net.Listen("tcp4", "127.0.0.1:7890")
+	srv.ln, err = net.Listen("tcp4", addr)
 	if err != nil {
 		log.Println("start failed: ", err)
 		return nil
@@ -161,7 +172,7 @@ func (c *conn)serve() {
 		bf.ReadBlock(&bb)
 		bf.WriteBlock([]byte("hello"))
 
-		c.srv.h[0x01].handle(c.rwc, rq)
+		c.srv.h["0x01"].handle(c.rwc, rq)
 	}
 }
 
@@ -173,16 +184,16 @@ func (c *conn)WriteBlock(b []byte) {
 
 
 // handle
-type echo struct {}
-func (e echo)handle(w io.Writer, rq Request) {
+type Echo struct {}
+func (e Echo)handle(w io.Writer, rq Request) {
 		rq.data.WriteTo(w)
 }
 
 func main() {
 	var s Server
-	var e echo
-	s.AddHandleFunc(0x01, e)
-	go s.Start()
+	var e Echo
+	s.AddHandleFunc("0x01", e)
+	go s.Start(":7890")
 
 	time.Sleep(3*time.Second)
 

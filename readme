@@ -4,23 +4,36 @@
 	3> send struct to server, receive struct from server. encode/decode struct with protobuf
 	4> build service logic code on top of the "struct i/o"
 
+=============
+Design 
+
 1. server is stateless
    which means each client's request should contain all of the neccessary info
    so when design the protobuf's struct, consider include all neccessary info.
 
-2. why use "name" string instead of binary code
-	1> code more readable
+2. use "name" string instead of binary code
+	1> more readable
 	2> name can be layered. eg: "pub/mp3"
+	3> "none" as default nil
 
-3. internel implementaion
+3. compared with tcp connection
+	- same interface: listen, dial, read,  write , error
+	- same io
+	- differenct data: 
+		- tcp read/write use []byte, rpc read/write protobuf struct(with name)
+
+=============
+Implementaion 
+
+4. internel interface
 	rpc.Encode("name", &struct) b []byte
 	rpc.Decode(b) name string
 
-4. server implementation
+5. server interface
 	rpc.ListenAndServe(addr string)
 	rpc.HandleFunc("name", handle)
 
-5. client implementation
+6. client interface
 	rpc.Dial(server_addr string)
 	rpc.WriteBlock("name", b)
-	rpc.ReadBlock(&b) name string // non-block
+	rpc.ReadBlock(&b) (name string, error) // non-block
